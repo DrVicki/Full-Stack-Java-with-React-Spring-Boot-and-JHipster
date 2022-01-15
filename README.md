@@ -275,6 +275,10 @@ source .auth0.env
   
 You should see your app's homepage with a link to sign in. Click **sign in**, and you'll be redirected to Auth0 to log in.
   
+![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/02_auth0-login.png)
+  
+After entering your credentials, you'll be redirected back to your app.
+  
 
 
 
