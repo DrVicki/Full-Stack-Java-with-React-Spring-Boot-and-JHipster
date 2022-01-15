@@ -236,7 +236,7 @@ private static List<GrantedAuthority> mapRolesToGrantedAuthorities(Collection<St
   
 The ```SecurityConfiguration.java``` class has a bean which calls this method to configure a user's roles from their OIDC data.
 
-111
+```
 @Bean
 public GrantedAuthoritiesMapper userAuthoritiesMapper() {
     return authorities -> {
@@ -267,4 +267,14 @@ source .auth0.env
 ./mvnw
 ```
 
-Boom - your full-stack app is now using Auth0! Open your favorite browser to ```http://localhost:8080```.
+
+**Boom**! - your full-stack app is now using Auth0! Open your favorite browser to ```http://localhost:8080```.
+  
+![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/04_jhipster-homepage.png) 
+  
+  
+You should see your app's homepage with a link to sign in. Click **sign in**, and you'll be redirected to Auth0 to log in.
+  
+
+
+
