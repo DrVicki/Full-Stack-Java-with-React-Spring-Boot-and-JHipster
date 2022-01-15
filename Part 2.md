@@ -179,8 +179,11 @@ const metadata = (
 const metadataRows = isNew ? '' : metadata;
 
 return ( ... );
-Then, in the return block, remove the JSX between the image property and album property and replace it with {metadataRows}.
+```
 
+Then, in the return block, remove the JSX between the image property and album property and replace it with ```{metadataRows}```.
+
+```
 <ValidatedBlobField
   label={translate('flickr2App.photo.image')}
   id="photo-image"
@@ -205,7 +208,7 @@ Then, in the return block, remove the JSX between the image property and album p
 </ValidatedField>
 ```
 
-In src/test/javascript/cypress/integration/entity/photo.spec.ts, remove the code that sets the data in these fields:
+In ```src/test/javascript/cypress/integration/entity/photo.spec.ts```, remove the code which sets the data in these fields:
 
 ```
 cy.get(`[data-cy="height"]`).type('99459').should('have.value', '99459');
@@ -283,3 +286,111 @@ liquibase:
 Stop your Spring Boot backend and run ```rm -r target/h2db``` to clear out your database (or just delete the ```target/h2db``` directory). Restart your backend.
 
 Now you should be able to upload photos and see the results in a nice grid at the top of the list.
+![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/08_photo-gallery.jpeg)
+
+You can also add a "lightbox" feature to the grid so you can click on photos and zoom in. The [React Photo Gallery docs](https://neptunian.github.io/react-photo-gallery/) shows how to do this. I've integrated it into the example for this post, but I won't show the code here for the sake of brevity. You can see the final ```photo.tsx``` with Lightbox added on GitHub or a diff of the necessary changes.
+
+## Make Your Full Stack Java App Into a PWA ##
+
+**Progressive Web Apps**, (PWAs), are the best way for developers to make their webapps load faster and more performant. In a nutshell, PWAs are websites which use recent web standards to allow for installation on a user's computer or device and deliver an app-like experience to those users. To make a web app into a PWA:
+
+  - Your app must be served over HTTPS
+  - Your app must register a service worker so it can cache requests and work offline
+  - Your app must have a webapp manifest with installation information and icons
+
+For ```HTTPS```, you can set up a certificate for ```localhost``` or (even better), deploy it to production! Cloud providers like **Heroku** will provide you with HTTPS out-of-the-box, but they won't force ```HTTPS```. To force ```HTTPS```, open ```src/main/java/com/auth0/flickr2/config/SecurityConfiguration.java``` and add a rule to force a secure channel when an ```X-Forwarded-Proto``` header is sent.
+
+```
+@Override
+protected void configure(HttpSecurity http) throws Exception {
+    http
+        ...
+    .and()
+        .frameOptions()
+        .deny()
+    .and()
+        .requiresChannel()
+        .requestMatchers(r -> r.getHeader("X-Forwarded-Proto") != null)
+        .requiresSecure()
+    .and()
+        .authorizeRequests()
+        ...
+}
+```
+
+The ```workbox-webpack-plugin``` is configured already for generating a service worker, but it only works when running your app with a production profile. This is nice because it means your data isn't cached in the browser when you're developing.
+
+To register a service worker, open ```src/main/webapp/index.html``` and uncomment the following block of code.
+
+```
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('/service-worker.js').then(function () {
+        console.log('Service Worker Registered');
+      });
+    });
+  }
+</script>
+```
+
+The final feature — a webapp manifest — is included at ```src/main/webapp/manifest.webapp```. It defines an app ```name```, ```colors```, and ```icons```. You might want to adjust these to fit your app.
+
+## Deploy Your React + Spring Boot App to Heroku ##
+
+To deploy your app to Heroku, you'll first need to install the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli). You can confirm it's installed by running ```heroku --version```.
+
+If you don't have a Heroku account, go to [heroku.com](heroku.com ) and sign up. Don't worry, it's free, and chances are you'll love the experience.
+
+Run ```heroku login``` to log in to your account, then start the deployment process with JHipster:
+
+```
+jhipster heroku
+```
+
+This will start the [Heroku sub-generator](https://www.jhipster.tech/heroku/) which asks you a couple of questions about your app: what you want to name it and whether you want to deploy it to a US region or EU. Then it'll prompt you to choose between building locally or with Git on Heroku's servers. Choose Git, so you don't have to upload a fat JAR. When prompted to use Okta for OIDC, select ```No```. Then, the deployment process will begin.
+
+You'll be prompted to overwrite ```pom.xml```—type ```a``` to allow overwriting all files.
+
+If you have a stable and fast internet connection, your app should be live on the internet in around six minutes!
+
+```
+remote: -----> Compressing...
+remote:        Done: 120.9M
+remote: -----> Launching...
+remote:        Released v7
+remote:        https://flickr-2.herokuapp.com/ deployed to Heroku
+remote:
+remote: Verifying deploy... done.
+
+To https://git.heroku.com/flickr-2.git
+ * [new branch]      HEAD -> main
+
+Your app should now be live. To view it, run
+   heroku open
+And you can view the logs with this command
+    heroku logs --tail
+After application modification, redeploy it with
+    jhipster heroku
+Congratulations, JHipster execution, is complete!
+Sponsored with ❤️ by @oktadev.
+Execution time: 6 min. 19 s.
+```
+
+## Configure for Auth0 and Analyze Your PWA Score with Lighthouse ##
+
+To configure your app to work with Auth0 on Heroku, run the following command to set your Auth0 variables on Heroku.
+
+```
+heroku config:set \
+  SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_OIDC_ISSUER_URI="https://<your-auth0-domain>/" \
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_ID="<your-client-id>" \
+  SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_OIDC_CLIENT_SECRET="<your-client-secret>" \
+  JHIPSTER_SECURITY_OAUTH2_AUDIENCE="https://<your-auth0-domain>/api/v2/"
+  ```
+Then, log in to your Auth0 account, navigate to your app, and add your Heroku URLs as valid redirect URIs:
+
+  - Allowed Callback URLs: ```https://flickr-2.herokuapp.com/login/oauth2/code/oidc```
+  - Allowed Logout URLs: ```https://flickr-2.herokuapp.com```
+
+After Heroku restarts your app, open it with ```heroku open``` and log in.
