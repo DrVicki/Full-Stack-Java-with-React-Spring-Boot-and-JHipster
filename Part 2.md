@@ -397,3 +397,7 @@ After Heroku restarts your app, open it with ```heroku open``` and log in.
 ![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/09_app-on-heroku.png)
 
 Then, test it with [Lighthouse](https://developers.google.com/web/tools/lighthouse/) (using the Lighthouse tab in Chrome developer tools). Looks pretty good, eh?! 💯
+
+![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/06_lighthouse-score.png)
+
+It's pretty secure too, according to [securityheaders.com](https://securityheaders.com/).
