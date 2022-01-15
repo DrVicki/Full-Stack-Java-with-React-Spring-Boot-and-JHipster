@@ -280,5 +280,33 @@ You should see your app's homepage with a link to sign in. Click **sign in**, an
 After entering your credentials, you'll be redirected back to your app.
   
 
+![](https://github.com/DrVicki/Full-Stack-Java-with-React-Spring-Boot-and-JHipster/blob/main/hipster-images/05_jhipster-logged-in.png)
 
+**Test Your Full Stack Java App with Cypress**
 
+JHipster has Auth0 support built-in, so you can specify your credentials for Cypress tests and automate your UI testing!
+
+To do this, open a new terminal window, specify the credentials for the Auth0 user you just created, and run ```npm run e2e```.
+
+```
+export CYPRESS_E2E_USERNAME=<new-username>
+export CYPRESS_E2E_PASSWORD=<new-password>
+npm run e2e
+```
+  
+**TIP**: If you want to use a ```.env``` file for your environment variables, you can use cypress-dotenv. You can also put these values in ```cypress.json```, but since this file will be in source control, it's a bad practice to put your secrets in it.
+
+Everything should pass in about a minute.
+  
+```
+
+       Spec                                              Tests  Passing  Failing  Pending  Skipped
+  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
+  │ ✔  administration/administration.spec.      00:31        5        5        -        -        - │
+  │    ts                                                                                          │
+  └────────────────────────────────────────────────────────────────────────────────────────────────┘
+    ✔  All specs passed!                        00:31        5        5        -        -        -
+
+Execution time: 44 s.
+```
+Shut down the process running your JHipster app - it's time to create some data handling for your Flickr clone!
